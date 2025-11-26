@@ -18,5 +18,94 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  cart      Cart?
+  orders    Order[]
+  addresses Address[]
+
   @@map("users")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Decimal
+  image       String
+  category    String
+  subCategory String
+  sizes       String   // Stored as JSON string or comma-separated
+  bestseller  Boolean  @default(false)
+  date        Int      // Timestamp
+  
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  updatedAt DateTime   @updatedAt
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  size      String?
+
+  @@map("cart_items")
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  userId    Int
+  user      User        @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  amount    Decimal
+  address   String      // Stored as JSON string for simplicity or relation
+  status    String      @default("Order Placed")
+  payment   Boolean     @default(false)
+  paymentMethod String
+  date      Int         // Timestamp
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  size      String?
+  price     Decimal
+
+  @@map("order_items")
+}
+
+model Address {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id])
+  firstName String
+  lastName  String
+  email     String
+  street    String
+  city      String
+  state     String
+  zipcode   String
+  country   String
+  phone     String
+
+  @@map("addresses")
 }
