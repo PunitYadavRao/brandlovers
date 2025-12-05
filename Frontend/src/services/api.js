@@ -1,6 +1,6 @@
 import { buildQueryString } from '@/utils/utils';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
 
 // Fetch wrapper with interceptors
 const fetchWithAuth = async (url, options = {}) => {
@@ -29,7 +29,7 @@ const fetchWithAuth = async (url, options = {}) => {
       const errorData = await response.json().catch(() => ({}));
       const error = new Error(errorData.message || `Request failed with status ${response.status}`);
       error.status = response.status;
-      error.response = { 
+      error.response = {
         status: response.status,
         data: errorData
       };
