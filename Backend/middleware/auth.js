@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 
-export const verifyToken = async (req, res, next) => {
+// Authenticate user from JWT token
+export const authenticate = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1]
 
@@ -21,6 +22,27 @@ export const verifyToken = async (req, res, next) => {
     })
   }
 }
+
+// Require admin role
+export const requireAdmin = async (req, res, next) => {
+  try {
+    if (!req.user || !req.user.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      })
+    }
+    next()
+  } catch (error) {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied'
+    })
+  }
+}
+
+// Legacy alias for backward compatibility
+export const verifyToken = authenticate
 
 export const errorHandler = (err, req, res, next) => {
   console.error(err)

@@ -13,7 +13,9 @@ export const AuthProvider = ({ children }) => {
     setError(null)
     try {
       const response = await authService.signup(email, password, name)
-      const { token, user: userData } = response.data.data
+      // Handle both response.data and response.data.data structures
+      const responseData = response.data?.data || response.data
+      const { token, user: userData } = responseData
       saveToken(token)
       saveUser(userData)
       setUser(userData)
@@ -32,13 +34,45 @@ export const AuthProvider = ({ children }) => {
     setError(null)
     try {
       const response = await authService.login(email, password)
-      const { token, user: userData } = response.data.data
+      // Handle both response.data and response.data.data structures
+      const responseData = response.data?.data || response.data
+      const { token, user: userData } = responseData
       saveToken(token)
       saveUser(userData)
       setUser(userData)
       return response.data
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Login failed'
+      setError(errorMessage)
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const adminLogin = useCallback(async (email, password) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await authService.adminLogin(email, password)
+      console.log('Admin login full response:', response)
+
+      // The API returns: { success, message, data: { user, token } }
+      // So we need response.data (not response.data.data)
+      const { token, user: userData } = response.data
+
+      if (!token || !userData) {
+        throw new Error('Invalid response from server')
+      }
+
+      console.log('Saving token and user:', { token, userData })
+      saveToken(token)
+      saveUser(userData)
+      setUser(userData)
+      return response.data
+    } catch (err) {
+      console.error('Admin login error:', err)
+      const errorMessage = err.response?.data?.message || err.message || 'Admin login failed'
       setError(errorMessage)
       throw err
     } finally {
@@ -68,9 +102,12 @@ export const AuthProvider = ({ children }) => {
     error,
     signup,
     login,
+    adminLogin,
     logout,
     getProfile,
     isAuthenticated: !!user,
+    isAdmin: user?.isAdmin || false,
+    role: user?.role || 'USER',
     token: getToken()
   }
 

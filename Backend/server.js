@@ -2,24 +2,33 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import authRoutes from './routes/authRoutes.js'
+import productRoutes from './routes/productRoutes.js'
+import adminRoutes from './routes/adminRoutes.js'
+import cartRoutes from './routes/cartRoutes.js'
+import orderRoutes from './routes/orderRoutes.js'
 import { errorHandler } from './middleware/auth.js'
 
 dotenv.config()
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8000
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN,
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:5173'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
 app.use('/auth', authRoutes)
+app.use('/api/products', productRoutes)
+app.use('/api/cart', cartRoutes)
+app.use('/api/orders', orderRoutes)
+app.use('/api/admin', adminRoutes)
 
 app.get('/health', (req, res) => {
   return res.status(200).json({

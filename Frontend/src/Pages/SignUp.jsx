@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext'
 const SignUp = () => {
   const navigate = useNavigate()
   const { signup, loading: authLoading } = useContext(AuthContext)
-  
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,7 +22,7 @@ const SignUp = () => {
       ...prev,
       [name]: value
     }))
-    
+
     // Clear errors when user starts typing
     if (error) setError('')
     if (passwordError) setPasswordError('')
@@ -50,13 +50,18 @@ const SignUp = () => {
       await signup(formData.email, formData.password, name)
       navigate('/') // Redirect to home after successful signup
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create account. Please try again.')
+      console.error('Signup error:', err)
+      // Extract the most specific error message available
+      const errorMessage = err.response?.data?.message || 
+                          err.message || 
+                          'Failed to create account. Please try again.'
+      setError(errorMessage)
     }
   }
 
   return (
-    <div className='flex items-center justify-center min-h-screen py-10'>
-      <div className='border border-gray-500 rounded-3xl p-8 sm:p-12 w-full max-w-md'>
+    <div className='flex items-center justify-center min-h-screen py-6'>
+      <div className='border border-gray-500 rounded-3xl p-8 sm:p-12 w-full max-w-md shadow-lg'>
         {/* Header */}
         <div className='mb-8'>
           <h1 className='almendra-display-regular text-4xl text-gray-800 mb-2'>
