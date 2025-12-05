@@ -19,11 +19,18 @@ app.use(express.urlencoded({ extended: true }))
 
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:5173'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  origin: '*',
+  credentials: false,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }))
+
+app.get('/', (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: 'Brand Lovers API is running'
+  })
+})
 
 app.use('/auth', authRoutes)
 app.use('/api/products', productRoutes)
